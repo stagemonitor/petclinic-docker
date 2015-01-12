@@ -1,0 +1,20 @@
+FROM sionsmith/tomcat-7
+
+MAINTAINER Sion Smith sion.smith@gmail.com
+
+RUN apt-get -qq update
+
+#install maven and git to build project
+RUN apt-get install -y wget git-core maven
+
+# Pull project
+RUN git clone https://github.com/stagemonitor/spring-petclinic.git
+
+# Build project
+RUN cd spring-petclinic && mvn package
+RUN mv /spring-petclinic/target/petclinic.war /opt/tomcat/webapps/petclinic.war
+
+RUN mkdir /opt/aspectj && cd /opt/aspectj &&\
+    wget http://search.maven.org/remotecontent?filepath=org/aspectj/aspectjweaver/1.8.2/aspectjweaver-1.8.2.jar
+
+ADD ./setenv.sh /opt/tomcat/bin/setenv.sh
